@@ -28,8 +28,6 @@ import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { fetchSchedules } from '../../utils/fetchSchedules'
 
-const SCHEDULES_URL = 'https://01e0-2800-300-6431-2c00-b8c1-3f6f-914d-bfd3.ngrok-free.app/api/schedules'
-
 const ScheduleList = () => {
   const [dropdownValue, setDropdownValue] = useState('');
   const [schedules, setSchedules] = useState([])
@@ -37,7 +35,7 @@ const ScheduleList = () => {
   useEffect(() => {
     
     const fetchData = async () => {
-      const data = await fetchSchedules(SCHEDULES_URL)
+      const data = await fetchSchedules()
       console.log('DATA', data);
     
       setSchedules(data)

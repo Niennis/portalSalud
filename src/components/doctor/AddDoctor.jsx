@@ -3,11 +3,19 @@
 import React, { useState } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
-import { DatePicker} from "antd";
+import { DatePicker } from "antd";
 import Select from "react-select";
 import { Link } from 'react-router-dom';
 import FeatherIcon from "feather-icons-react/build/FeatherIcon";
+
+import { useForm } from 'react-hook-form'
+import { addDoctor } from "../../utils/fetchUsers";
+
 const AddDoctor = () => {
+  const { register, handleSubmit, watch,
+    formState: { errors }
+  } = useForm()
+
   const [isClicked, setIsClicked] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [options, setOptions] = useState([
@@ -35,11 +43,19 @@ const AddDoctor = () => {
 
   const onChange = (date, dateString) => {
     // console.log(date, dateString);
+    console.log(date, dateString);
+
     setIsClicked(true);
   };
   const loadFile = (event) => {
     // Handle file loading logic here
   };
+
+  const onSubmit = handleSubmit(data => {
+    console.log('enviadoo', data)
+
+    addDoctor(data)
+  })
 
   return (
     <div>
@@ -54,14 +70,14 @@ const AddDoctor = () => {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                     <Link to="#">Doctors </Link>
+                      <Link to="#">Doctors </Link>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right">
                         <FeatherIcon icon="chevron-right" />
                       </i>
                     </li>
-                    <li className="breadcrumb-item active">Add Doctor</li>
+                    <li className="breadcrumb-item active">Agregar Doctor</li>
                   </ul>
                 </div>
               </div>
@@ -75,37 +91,51 @@ const AddDoctor = () => {
                       <div className="row">
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Doctor Details</h4>
+                            <h4>Detalles doctor</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              First Name <span className="login-danger">*</span>
+                              Nombre <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
                               placeholder=""
+                              {...register('name', {
+                                required: {
+                                  value: true,
+                                  message: 'Nombre es requerido'
+                                },
+                                minLength: {
+                                  value: 2,
+                                  message: 'Nombre debe tener al menos 2 caracteres'
+                                }
+                              })}
+                            />
+                            {
+                              errors.name && <span><small>{errors.name.message}</small></span>
+                            }
+                          </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-xl-4">
+                          <div className="form-group local-forms">
+                            <label>
+                              Apellidos <span className="login-danger">*</span>
+                            </label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              placeholder=""
+                              {...register('lastName')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Last Name <span className="login-danger">*</span>
-                            </label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              placeholder=""
-                            />
-                          </div>
-                        </div>
-                        <div className="col-12 col-md-6 col-xl-4">
-                          <div className="form-group local-forms">
-                            <label>
-                              User Name <span className="login-danger">*</span>
+                              Nombre de usuario <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
@@ -117,56 +147,86 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Mobile <span className="login-danger">*</span>
+                              Teléfono <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
                               placeholder=""
+                              {...register('mobile')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Email <span className="login-danger">*</span>
+                              Correo electrónico <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="email"
-                              placeholder=""
+                              placeholder=""{...register('email', {
+                                required: {
+                                  value: true,
+                                  message: 'Correo es requerido'
+                                },
+                                // pattern: {
+                                //   value: /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\. [a-zA-Z]{2,4}$/,
+                                //   message: 'Correo no es válido'
+                                // }
+                              })}
                             />
+                            {errors.email && <span><small>{errors.email.message}</small></span>}
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Password <span className="login-danger">*</span>
+                              Contraseña <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="password"
                               placeholder=""
+                              {...register('password', {
+                                required: {
+                                  value: true,
+                                  message: 'Password es requerida'
+                                },
+                                minLength: {
+                                  value: 6,
+                                  message: 'Contraseña debe tener al menos 6 caracteres'
+                                }
+                              })}
                             />
+                            {errors.password && <span><small>{errors.password.message}</small></span>}
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Confirm Password{" "}
+                              Confirmar Contraseña{" "}
                               <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="password"
                               placeholder=""
+                              {...register('confirmPassword', {
+                                required: {
+                                  value: true,
+                                  message: 'Confirmación requerida'
+                                },
+                                validate: value => value === watch('password') || 'Las contraseñas no coinciden'
+                              })}
                             />
+                            {errors.confirmPassword && <span><small>{errors.confirmPassword.message}</small></span>}
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms cal-icon">
                             <label>
-                              Date Of Birth{" "}
+                              Fecha de nacimiento {" "}
                               <span className="login-danger">*</span>
                             </label>
                             <DatePicker
@@ -182,7 +242,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group select-gender">
                             <label className="gen-label">
-                              Gender<span className="login-danger">*</span>
+                              Género <span className="login-danger">*</span>
                             </label>
                             <div className="form-check-inline">
                               <label className="form-check-label">
@@ -190,8 +250,9 @@ const AddDoctor = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
+                                  {...register('male')}
                                 />
-                                Male
+                                Masculino
                               </label>
                             </div>
                             <div className="form-check-inline">
@@ -200,8 +261,9 @@ const AddDoctor = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
+                                  {...register('female')}
                                 />
-                                Female
+                                Femenino
                               </label>
                             </div>
                           </div>
@@ -209,19 +271,20 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Education <span className="login-danger">*</span>
+                              Especialidad <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
                               placeholder=""
+                              {...register('speciality')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Designation{" "}
+                              Designación {" "}
                               <span className="login-danger">*</span>
                             </label>
                             <input
@@ -234,7 +297,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Department <span className="login-danger">*</span>
+                              Departmento <span className="login-danger">*</span>
                             </label>
                             <Select
                               defaultValue={selectedOption}
@@ -247,14 +310,14 @@ const AddDoctor = () => {
                               styles={{
                                 control: (baseStyles, state) => ({
                                   ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                  borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                  boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
                                   '&:hover': {
                                     borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
                                   },
                                   borderRadius: '10px',
                                   fontSize: "14px",
-                                    minHeight: "45px",
+                                  minHeight: "45px",
                                 }),
                                 dropdownIndicator: (base, state) => ({
                                   ...base,
@@ -271,7 +334,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Address <span className="login-danger">*</span>
+                              Dirección <span className="login-danger">*</span>
                             </label>
                             <textarea
                               className="form-control"
@@ -284,7 +347,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
-                              City <span className="login-danger">*</span>
+                            Ciudad <span className="login-danger">*</span>
                             </label>
                             <Select
                               menuPosition={'fixed'}
@@ -301,14 +364,14 @@ const AddDoctor = () => {
                               styles={{
                                 control: (baseStyles, state) => ({
                                   ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                  borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                  boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
                                   '&:hover': {
                                     borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
                                   },
                                   borderRadius: '10px',
                                   fontSize: "14px",
-                                    minHeight: "45px",
+                                  minHeight: "45px",
                                 }),
                                 dropdownIndicator: (base, state) => ({
                                   ...base,
@@ -324,7 +387,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
-                              Country <span className="login-danger">*</span>
+                            País <span className="login-danger">*</span>
                             </label>
                             <Select
                               menuPosition={'fixed'}
@@ -341,14 +404,14 @@ const AddDoctor = () => {
                               styles={{
                                 control: (baseStyles, state) => ({
                                   ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                  borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                  boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
                                   '&:hover': {
                                     borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
                                   },
                                   borderRadius: '10px',
                                   fontSize: "14px",
-                                    minHeight: "45px",
+                                  minHeight: "45px",
                                 }),
                                 dropdownIndicator: (base, state) => ({
                                   ...base,
@@ -365,7 +428,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
-                              State/Province{" "}
+                            Región {" "}
                               <span className="login-danger">*</span>
                             </label>
                             <Select
@@ -383,14 +446,14 @@ const AddDoctor = () => {
                               styles={{
                                 control: (baseStyles, state) => ({
                                   ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                  borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                  boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
                                   '&:hover': {
                                     borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
                                   },
                                   borderRadius: '10px',
                                   fontSize: "14px",
-                                    minHeight: "45px",
+                                  minHeight: "45px",
                                 }),
                                 dropdownIndicator: (base, state) => ({
                                   ...base,
@@ -404,7 +467,7 @@ const AddDoctor = () => {
 
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-3">
+                         {/* <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
                               Postal Code{" "}
@@ -415,12 +478,12 @@ const AddDoctor = () => {
                               type="text"
                               placeholder=""
                             />
-                          </div>
-                        </div>
+                          </div> 
+                        </div> */}
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Start Biography{" "}
+                            Biografía {" "}
                               <span className="login-danger">*</span>
                             </label>
                             <textarea
@@ -445,8 +508,8 @@ const AddDoctor = () => {
                                 onChange={loadFile}
                                 className="hide-input"
                               />
-                                <label htmlFor="file" className="upload">
-                                Choose File
+                              <label htmlFor="file" className="upload">
+                                Seleccionar imagen
                               </label>
                             </div>
                             {/* <div className="settings-btn upload-files-avator">
@@ -467,7 +530,7 @@ const AddDoctor = () => {
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group select-gender">
                             <label className="gen-label">
-                              Status <span className="login-danger">*</span>
+                              Estado <span className="login-danger">*</span>
                             </label>
                             <div className="form-check-inline">
                               <label className="form-check-label">
@@ -476,7 +539,7 @@ const AddDoctor = () => {
                                   name="gender"
                                   className="form-check-input"
                                 />
-                                Active
+                                Activo
                               </label>
                             </div>
                             <div className="form-check-inline">
@@ -486,7 +549,7 @@ const AddDoctor = () => {
                                   name="gender"
                                   className="form-check-input"
                                 />
-                                In Active
+                                Inactivo
                               </label>
                             </div>
                           </div>
@@ -494,16 +557,16 @@ const AddDoctor = () => {
                         <div className="col-12">
                           <div className="doctor-submit text-end">
                             <button
-                              type="submit"
                               className="btn btn-primary submit-form me-2"
+                              onClick={onSubmit}
                             >
-                              Submit
+                              Enviar
                             </button>
                             <button
                               type="submit"
                               className="btn btn-primary cancel-form"
                             >
-                              Cancel
+                              Cancelar
                             </button>
                           </div>
                         </div>
@@ -522,7 +585,7 @@ const AddDoctor = () => {
               <div className="drop-scroll msg-list-scroll" id="msg_list">
                 <ul className="list-box">
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">R</span>
@@ -539,7 +602,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item new-message">
                         <div className="list-left">
                           <span className="avatar">J</span>
@@ -556,7 +619,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">T</span>
@@ -576,7 +639,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">M</span>
@@ -593,7 +656,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">C</span>
@@ -613,7 +676,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">D</span>
@@ -633,7 +696,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">B</span>
@@ -653,7 +716,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">R</span>
@@ -673,7 +736,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">C</span>
@@ -690,7 +753,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">M</span>
@@ -707,7 +770,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">J</span>
@@ -724,7 +787,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">L</span>
@@ -741,7 +804,7 @@ const AddDoctor = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">T</span>
@@ -762,7 +825,7 @@ const AddDoctor = () => {
                 </ul>
               </div>
               <div className="topnav-dropdown-footer">
-               <Link to="#">See all messages</Link>
+                <Link to="#">See all messages</Link>
               </div>
             </div>
           </div>

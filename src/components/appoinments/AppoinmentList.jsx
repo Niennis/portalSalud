@@ -11,7 +11,7 @@ import FeatherIcon from 'feather-icons-react/build/FeatherIcon';
 
 import { fetchAppointments } from '../../utils/appointments'
 
-const APPOINTMENTS_URL = 'https://fe01-2800-300-6431-2c00-b8c1-3f6f-914d-bfd3.ngrok-free.app/api/appointments'
+const APPOINTMENTS_URL = 'https://appointments-y4fi.onrender.com' + '/api/appointments'
 
 
 const AppoinmentList = () => {

@@ -12,16 +12,14 @@ import {
 } from '../imagepath';
 import { Link } from 'react-router-dom';
 
-const PACIENTES_URL = 'https://3674-2800-300-6431-2c00-b8c1-3f6f-914d-bfd3.ngrok-free.app/api/users'
-
 const PatientsList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [users, setUsers] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchUsers(PACIENTES_URL)
-      const newArray = [...data.response.filter(user => user.tipo_usuario === 'alumno')]
+      const data = await fetchUsers()
+      const newArray = [...data.filter(user => user.tipo_usuario === 'alumno')]
 
       setUsers(newArray)
     }

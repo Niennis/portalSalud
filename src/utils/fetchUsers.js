@@ -1,5 +1,7 @@
-export async function fetchUsers(url) {
-  const data = await fetch( url , {
+export async function fetchUsers() {
+  const USERS_API = process.env.REACT_APP_USERS_API 
+
+  const data = await fetch( USERS_API + `/api/users`, {
     headers: {
       'content-type': 'application/json',
       'access-control-allow-origin': '*',
@@ -10,7 +12,7 @@ export async function fetchUsers(url) {
 }
 
 export async function addUsers(user) {
-  const USERS_API = 'https://5cad-2800-300-6431-2c00-e51f-908c-ed18-99c2.ngrok-free.app'
+  const USERS_API = process.env.REACT_APP_USERS_API
   const data = await fetch(USERS_API + '/api/users', {
     method: "POST",
     cors: "no-cors",
@@ -36,7 +38,7 @@ export async function addUsers(user) {
 
 
 export async function fetchUser(id) {
-  const USERS_API = 'https://5cad-2800-300-6431-2c00-e51f-908c-ed18-99c2.ngrok-free.app'
+  const USERS_API = process.env.REACT_APP_USERS_API
   const data = await fetch( USERS_API + `/api/users/${id}`, {
     headers: {
       'content-type': 'application/json',
@@ -49,7 +51,7 @@ export async function fetchUser(id) {
 
 export async function updateUser(user, id) {
   console.log('EDITUSER', user)
-  const USERS_API = 'https://5cad-2800-300-6431-2c00-e51f-908c-ed18-99c2.ngrok-free.app'
+  const USERS_API = process.env.REACT_APP_USERS_API
   const data = await fetch(USERS_API + `/api/users/${id}`, {
     method: "PUT",
     headers: {
@@ -72,11 +74,10 @@ export async function updateUser(user, id) {
   return data
 }
 
+export async function fetchDoctors() {
+  const USERS_API = process.env.REACT_APP_USERS_API 
 
-
-export async function fetchDoctor(id) {
-  const USERS_API = 'https://5cad-2800-300-6431-2c00-e51f-908c-ed18-99c2.ngrok-free.app/api/professionals/'
-  const data = await fetch( USERS_API + `${id}`, {
+  const data = await fetch( USERS_API + `/api/professionals`, {
     headers: {
       'content-type': 'application/json',
       'access-control-allow-origin': '*',
@@ -87,9 +88,49 @@ export async function fetchDoctor(id) {
 }
 
 
+export async function fetchDoctor(id) {
+  const USERS_API = process.env.REACT_APP_USERS_API
+  const data = await fetch( USERS_API + `/api/professionals/${id}`, {
+    headers: {
+      'content-type': 'application/json',
+      'access-control-allow-origin': '*',
+      'ngrok-skip-browser-warning': 'any'
+    }
+  })
+  return data.json()
+}
+
+
+export async function addDoctor(user) {
+  const USERS_API = process.env.REACT_APP_USERS_API
+  const data = await fetch(USERS_API + '/api/professionals', {
+    method: "POST",
+    cors: "no-cors",
+    headers: {
+      'content-type': 'application/json',
+      'access-control-allow-origin': '*',
+      'ngrok-skip-browser-warning': 'any'
+    },
+    body: JSON.stringify({
+      "nombre": user.name,
+      "apellido": user.lastName,
+      "telefono": user.mobile,
+      "email": user.email,
+      "contrasena": user.password,
+      "fecha_nacimiento": user.date,
+      "genero": user.male === 'on' ? 'masculino' : 'femenino',
+      "especialidad": user.speciality,
+      "tipo_usuario": 'profesional'
+    })
+  })
+
+  return data.json()
+}
+
+
 export async function updateDoctor(user, id) {
-  const USERS_API = 'https://5cad-2800-300-6431-2c00-e51f-908c-ed18-99c2.ngrok-free.app/api/professionals/'
-  const data = await fetch(USERS_API + `${id}`, {
+  const USERS_API = process.env.REACT_APP_USERS_API
+  const data = await fetch(USERS_API + `/api/professionals/${id}`, {
     method: "PUT",
     headers: {
       'content-type': 'application/json',

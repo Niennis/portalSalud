@@ -84,7 +84,7 @@ const AddPatients = () => {
                       <div className="row">
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Patinets Details</h4>
+                            <h4>Detalles pacientes</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
@@ -567,7 +567,7 @@ const AddPatients = () => {
                               // type="submit"
                               className="btn btn-primary cancel-form"
                             >
-                              Cancel
+                              Cancelar
                             </button>
                           </div>
                         </div>

@@ -10,9 +10,7 @@ import {
 } from '../imagepath';
 import { Link } from 'react-router-dom';
 import FeatherIcon from 'feather-icons-react/build/FeatherIcon';
-import { fetchUsers } from '../../utils/fetchUsers'
-
-const ESPECIALISTAS_URL = 'https://3674-2800-300-6431-2c00-b8c1-3f6f-914d-bfd3.ngrok-free.app/api/professionals'
+import { fetchDoctors } from '../../utils/fetchUsers'
 
 const DoctorList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -20,10 +18,8 @@ const DoctorList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchUsers(ESPECIALISTAS_URL)
-      const newArray = [...data.response.filter(user => user.tipo_usuario === 'profesional')]
-
-      setUsers(newArray)
+      const data = await fetchDoctors()
+      setUsers(data)
     }
     fetchData()
   }, [])

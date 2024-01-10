@@ -10,12 +10,12 @@ import { fetchUsers } from "./fetchUsers"
 
 const doctorList = arr => arr.map(user => user.id)
 
-export const fetchSchedules = async(url) => {
+export const fetchSchedules = async() => {
   const doctors = await fetchUsers(process.env.REACT_APP_SCHEDULES_API + '/api/schedules')
 
   const docList = doctorList(doctors)
   console.log('doclist', docList);
-  const fetchData = await fetch(url, {
+  const fetchData = await fetch(process.env.REACT_APP_SCHEDULES_API + '/api/schedules', {
     headers: {
       'content-type': 'application/json',
       'access-control-allow-origin': '*',
