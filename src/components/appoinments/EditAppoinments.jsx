@@ -1,32 +1,91 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import { favicon, imagesend } from "../imagepath";
-import { DatePicker} from "antd";
+import { DatePicker } from "antd";
 import FeatherIcon from "feather-icons-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 import { TextField } from "@mui/material";
+import { useForm, Controller } from 'react-hook-form'
+import { fetchAppointment, updateAppointment } from "../../utils/appointments";
+import { fetchDoctors, fetchUsers } from '../../utils/fetchUsers'
 
 const EditAppoinments = () => {
+  const { id } = useParams();
+
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
   const [show, setShow] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [doctor, setDoctor] = useState([
     // { value: 1, label: "Select Doctor" },
-    { value: 2, label: "Dr.Bernardo James" },
-    { value: 3, label: "Dr.Andrea Lalema" },
-    { value: 4, label: "Dr.William Stephin" },
+    // { value: 2, label: "Dr.Bernardo James" },
+    // { value: 3, label: "Dr.Andrea Lalema" },
+    // { value: 4, label: "Dr.William Stephin" },
   ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetchDoctors()
+      const docs = response.map((doc, i) => {
+        return {
+          value: i + 2,
+          label: doc.nombre + ' ' + doc.apellido,
+          id: doc.id
+        }
+      })
+      setDoctor(docs)
+    }
+
+    fetchData()
+  }, [])
+
   const onChange = (date, dateString) => {
     // console.log(date, dateString);
   };
   const loadFile = (event) => {
     // Handle file loading logic here
   };
+
+
+  const { register, handleSubmit, watch, control,
+    formState: { errors }
+  } = useForm({
+    defaultValues: async () => fetchAppointment(id).then(appointment => {
+
+      const filterDoc = doctor.filter(doc => doc.label === appointment.nombre_profesional + ' ' + appointment.apellido_profesional)
+
+      console.log(filterDoc);
+      const obj = {
+        especialidad: appointment.especialidad,
+        appointment_date: appointment['fecha_cita'].slice(0, 10),
+        start_time: appointment['hora_cita'],
+        id: appointment.id,
+        email: appointment.mail_alumno,
+        name: appointment['nombre_alumno'],
+        lastName: appointment['apellido_alumno'],
+        selected_doctor: filterDoc[0]
+      }
+      return obj
+    })
+  })
+
+  const onSubmit = handleSubmit(async data => {
+    const patientName = watch("name")
+    const patientLastname = watch("lastName")
+    const patients = await fetchUsers()
+
+    const patient = patients.filter(user =>
+      user.nombre === patientName
+      & user.apellido === patientLastname
+      & user.tipo_usuario === 'alumno'
+    )
+    // addAppointment({ ...data, "patient_id": patient[0].id })
+    return updateAppointment({ ...data, "patient_id": patient[0].id }, id)
+  })
 
   return (
     <div>
@@ -45,14 +104,14 @@ const EditAppoinments = () => {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                      <Link to="#">Appointment </Link>
+                      <Link to="#">Cita </Link>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right">
                         <FeatherIcon icon="chevron-right" />
                       </i>
                     </li>
-                    <li className="breadcrumb-item active">Edit Appointment</li>
+                    <li className="breadcrumb-item active">Editar Cita</li>
                   </ul>
                 </div>
               </div>
@@ -66,37 +125,50 @@ const EditAppoinments = () => {
                       <div className="row">
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Patient Details</h4>
+                            <h4>Detalles del Paciente</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              First Name <span className="login-danger">*</span>
+                              Nombre <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
-                              defaultValue="Stephen"
+                              // defaultValue="Stephen"
+                              {...register('name', {
+                                required: {
+                                  value: true,
+                                  message: 'Nombre es requerido'
+                                },
+                                minLength: {
+                                  value: 2,
+                                  message: 'Nombre debe tener al menos 2 caracteres'
+                                }
+                              })}
                             />
+                            {
+                              errors.name && <span><small>{errors.name.message}</small></span>
+                            }
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Last Name <span className="login-danger">*</span>
+                              Apellido <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
-                              defaultValue="Bruklin"
+                              {...register('lastName')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group select-gender">
                             <label className="gen-label">
-                              Gender<span className="login-danger">*</span>
+                              Género<span className="login-danger">*</span>
                             </label>
                             <div className="form-check-inline">
                               <label className="form-check-label">
@@ -105,8 +177,9 @@ const EditAppoinments = () => {
                                   name="gender"
                                   className="form-check-input"
                                   defaultChecked=""
+                                // {...register('male')}
                                 />
-                                Male
+                                Masculino
                               </label>
                             </div>
                             <div className="form-check-inline">
@@ -115,8 +188,9 @@ const EditAppoinments = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
+                                // {...register('female')}
                                 />
-                                Female
+                                Femenino
                               </label>
                             </div>
                           </div>
@@ -124,57 +198,82 @@ const EditAppoinments = () => {
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Mobile <span className="login-danger">*</span>
+                              Teléfono <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
                               defaultValue="+1 23 456890"
+                            // {...register('mobile')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Email <span className="login-danger">*</span>
+                              Correo electrónico <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="email"
-                              defaultValue="stephen@gmail.com"
+                              {...register('email', {
+                                required: {
+                                  value: true,
+                                  message: 'Corre es requerido'
+                                },
+                                // pattern: {
+                                //   value: /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\. [a-zA-Z]{2,4}$/,
+                                //   message: 'Correo no es válido'
+                                // }
+                              })}
                             />
+                            {errors.email && <span><small>{errors.email.message}</small></span>}
+
                           </div>
                         </div>
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Address <span className="login-danger">*</span>
+                              Dirección <span className="login-danger">*</span>
                             </label>
                             <textarea
                               className="form-control"
                               rows={3}
                               cols={30}
                               defaultValue={
-                                "101, Elanxa Apartments, 340 N Madison Avenue"
+                                " "
                               }
                             />
                           </div>
                         </div>
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Appointment Details</h4>
+                            <h4>Detalles de la Cita</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms cal-icon">
                             <label>
-                              Date of Appointment{" "}
+                              Fecha de la Cita {" "}
                               <span className="login-danger">*</span>
                             </label>
-                            <DatePicker
-                              className="form-control datetimepicker"
-                              onChange={onChange}
-                              suffixIcon={null}
+                            <Controller
+                              control={control}
+                              name="appointment_date"
+                              {...register('appointment_date', {
+                                required: {
+                                  value: true,
+                                  message: 'Fecha es requerido',
+                                }
+                              })}
+                              ref={null}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <DatePicker
+                                  className="form-control datetimepicker"
+                                  onChange={onChange}
+                                  suffixIcon={null}
+                                />
+                              )}
                             />
                             {/* <input
                         className="form-control datetimepicker"
@@ -186,7 +285,7 @@ const EditAppoinments = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              From <span className="login-danger">*</span>
+                              Desde <span className="login-danger">*</span>
                             </label>
                             <div className="">
                               <TextField
@@ -197,6 +296,7 @@ const EditAppoinments = () => {
                                 onChange={(event) => {
                                   setStartTime(event.target.value);
                                 }}
+                                {...register('start_time')}
                               />
                             </div>
                           </div>
@@ -204,7 +304,7 @@ const EditAppoinments = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              To <span className="login-danger">*</span>
+                              Hasta <span className="login-danger">*</span>
                             </label>
                             <div className="">
                               <TextField
@@ -221,39 +321,53 @@ const EditAppoinments = () => {
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
-                            <label>Consulting Doctor</label>
-                            <Select
-                              defaultValue={selectedOption}
-                              onChange={setSelectedOption}
-                              options={doctor}
-                              menuPortalTarget={document.body}
-                              styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                              id="search-commodity"
-                              components={{
-                                IndicatorSeparator: () => null
-                              }}
-                              styles={{
-                                control: (baseStyles, state) => ({
-                                  ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
-                                  '&:hover': {
-                                    borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
-                                  },
-                                  borderRadius: '10px',
-                                  fontSize: "14px",
-                                    minHeight: "45px",
-                                }),
-                                dropdownIndicator: (base, state) => ({
-                                  ...base,
-                                  transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
-                                  transition: '250ms',
-                                  width: '35px',
-                                  height: '35px',
-                                }),
-                              }}
+                            <label>Doctor</label>
+                            <Controller
+                              control={control}
+                              name="selected_doctor"
+                              {...register('selected_doctor', {
+                                required: {
+                                  value: true,
+                                  message: 'Fecha es requerido',
+                                }
+                              })}
+                              ref={null}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <Select
+                                  defaultValue={selectedOption}
+                                  onChange={onChange}
+                                  options={doctor}
+                                  menuPortalTarget={document.body}
+                                  styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                  id="search-commodity"
+                                  components={{
+                                    IndicatorSeparator: () => null
+                                  }}
+                                  styles={{
+                                    control: (baseStyles, state) => ({
+                                      ...baseStyles,
+                                      borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                      boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                      '&:hover': {
+                                        borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
+                                      },
+                                      borderRadius: '10px',
+                                      fontSize: "14px",
+                                      minHeight: "45px",
+                                    }),
+                                    dropdownIndicator: (base, state) => ({
+                                      ...base,
+                                      transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
+                                      transition: '250ms',
+                                      width: '35px',
+                                      height: '35px',
+                                    }),
+                                  }}
 
+                                />
+                              )}
                             />
+
                             {/* <select className="form-control select">
                         <option>Select Doctor</option>
                         <option>Dr.Bernardo James</option>
@@ -264,18 +378,19 @@ const EditAppoinments = () => {
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
-                            <label>Treatment </label>
+                            <label>Especialidad </label>
                             <input
                               className="form-control"
                               type="text"
                               defaultValue="Blood Pressure"
+                              {...register('especialidad')}
                             />
                           </div>
                         </div>
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Notes <span className="login-danger">*</span>
+                              Notas <span className="login-danger">*</span>
                             </label>
                             <textarea
                               className="form-control"
@@ -287,7 +402,7 @@ const EditAppoinments = () => {
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-6">
+                        {/*   <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-top-form">
                             <label className="local-top">
                               Avatar <span className="login-danger">*</span>
@@ -301,7 +416,7 @@ const EditAppoinments = () => {
                                 onChange={loadFile}
                                 className="hide-input"
                               />
-                                 <label htmlFor="file" className="upload">
+                              <label htmlFor="file" className="upload">
                                 Choose File
                               </label>
                             </div>
@@ -320,20 +435,21 @@ const EditAppoinments = () => {
                               </Link>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="col-12">
                           <div className="doctor-submit text-end">
                             <button
-                              type="submit"
+                              // type="submit"
                               className="btn btn-primary submit-form me-2"
+                              onClick={onSubmit}
                             >
-                              Submit
+                              Enviar
                             </button>
                             <button
-                              type="submit"
+                              // type="submit"
                               className="btn btn-primary cancel-form"
                             >
-                              Cancel
+                              Cancelar
                             </button>
                           </div>
                         </div>
