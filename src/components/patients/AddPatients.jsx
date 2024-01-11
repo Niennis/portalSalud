@@ -32,9 +32,9 @@ const AddPatients = () => {
     console.log(date, dateString);
   };
   const [department, setDepartment] = useState([
-    { value: 2, label: "Orthopedics" },
-    { value: 3, label: "Radiology" },
-    { value: 4, label: "Dentist" },
+    { value: 2, label: "Médico general" },
+    { value: 3, label: "Psiquiatría" },
+    { value: 4, label: "Psicología" },
   ]);
   const loadFile = (event) => {
     // Handle file loading logic here

@@ -1,22 +1,65 @@
-import React  from "react";
-import { Link } from "react-router-dom";
+/* eslint-disable no-unused-vars */
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 // import FeatherIcon from "feather-icons-react";
 import { login02, loginicon01, loginicon02, loginlogo } from "../../imagepath";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+// import { jwtDecode } from 'jwt-decode'
+
+// import { login } from '../../../utils/AuthService'
 
 import { Eye, EyeOff } from "feather-icons-react/build/IconComponents";
 
-// import ReactPasswordToggleIcon from 'react-password-toggle-icon';
-
-
-
 const Login = () => {
+  // const [user, setUser] = useState({})
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  // const history = useNavigate();
+
+  const onChangeUsername = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const onChangePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
+  // const onSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await login(username, password);
+  //     history.push('/admin');
+  //   } catch (error) {
+  //     console.error('error', error);
+  //   }
+  // };
+
+  // const handleCallbackResponse = response => {
+  //   console.log('TOKEN', response.credential)
+  //   const userObject = jwtDecode(response.credential)
+  //   console.log('USEROBJECT', userObject);
+  //   setUser(userObject)
+  // }
+
+  // useEffect(() => {
+  //   /* global google */
+  //   google.accounts.id.initialize({
+  //     client_id: '537718634857-rtb387t8kvdm3qjd6qi526t922ml7of9.apps.googleusercontent.com',
+  //     callback: handleCallbackResponse
+  //   })
+
+  //   google.accounts.id.renderButton(
+  //     document.getElementById('signInDiv'),
+  //     { size: 'large', type: 'icon', shape: 'square', text: 'signin_with' }
+  //   )
+
+  // }, [])
 
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [password, setPassword] = useState('');
+  // const [password, setPassword] = useState('');
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -63,29 +106,37 @@ const Login = () => {
                       </div>
                       <h2>Login</h2>
                       {/* Form */}
-                      <form >
+                      <form 
+                        // onSubmit={onSubmit}
+                      >
                         <div className="form-group">
                           <label>
                             Email <span className="login-danger">*</span>
                           </label>
-                          <input className="form-control" type="text" />
+                          <input
+                            className="form-control"
+                            type="text"
+                            value={username}
+                            onChange={onChangeUsername}
+                          />
                         </div>
                         <div className="form-group">
                           <label>
                             Contraseña <span className="login-danger">*</span>
                           </label>
                           <input
-                          type={passwordVisible ? 'password' : ''}
-                          className="form-control pass-input"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <span
-                          className="toggle-password"
-                          onClick={togglePasswordVisibility}
-                        >
-                          {passwordVisible ? <EyeOff className="react-feather-custom" /> : <Eye className="react-feather-custom" />}
-                        </span>
+                            type={passwordVisible ? 'password' : ''}
+                            className="form-control pass-input"
+                            value={password}
+                            // onChange={(e) => setPassword(e.target.value)}
+                            onChange={onChangePassword}
+                          />
+                          <span
+                            className="toggle-password"
+                            onClick={togglePasswordVisibility}
+                          >
+                            {passwordVisible ? <EyeOff className="react-feather-custom" /> : <Eye className="react-feather-custom" />}
+                          </span>
                         </div>
                         <div className="forgotpass">
                           <div className="remember-me">
@@ -98,6 +149,9 @@ const Login = () => {
                           </div>
                           <Link to="/forgotpassword">¿Olvidó su contraseña?</Link>
                         </div>
+
+                        {/* <button type='submit'>Login</button> */}
+
                         <div className="form-group login-btn">
                           <Link to="/admin-dashboard"
                             className="btn btn-primary btn-block"
@@ -113,13 +167,13 @@ const Login = () => {
                           ¿Necesita una cuenta? <Link to="/signup">Registrarse</Link>
                         </p>
                         {/* Social Login */}
+
                         <div className="social-login">
                           <Link to="#">
-                            <img src={loginicon01} alt="#"/>
+
+                            <div id="signInDiv"></div>
                           </Link>
-                          <Link to="#">
-                            <img src={loginicon02}alt="#" />
-                          </Link>
+
                         </div>
                         {/* /Social Login */}
                       </div>

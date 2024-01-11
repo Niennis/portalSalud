@@ -161,7 +161,7 @@ const AddSchedule = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms cal-icon">
                             <label>
-                              Available Days <span className="login-danger">*</span>
+                              Días disponibles <span className="login-danger">*</span>
                             </label>
                            
                             <Controller
