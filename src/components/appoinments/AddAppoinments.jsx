@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import { DatePicker, Space } from "antd";
@@ -8,25 +8,58 @@ import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 import Select from "react-select";
 import { TextField } from "@mui/material";
 import { Link } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form'
+
+import { fetchDoctors, fetchUsers } from '../../utils/fetchUsers'
+import { addAppointment } from "../../utils/appointments";
 
 const AddAppoinments = () => {
+  const { register, handleSubmit, watch, control,
+    formState: { errors }
+  } = useForm()
+
   const [isClicked, setIsClicked] = useState(false);
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
   const [selectedOption, setSelectedOption] = useState(null);
-  const [doctor, setDoctor] = useState([
-    // { value: 1, label: "Select Doctor" },
-    { value: 2, label: "Dr.Bernardo James" },
-    { value: 3, label: "Dr.Andrea Lalema" },
-    { value: 4, label: "Dr.William Stephin" },
-  ]);
+  const [doctor, setDoctor] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetchDoctors()
+      const docs = response.map((doc, i) => {
+        return {
+          value: i + 2,
+          label: doc.nombre + ' ' + doc.apellido,
+          id: doc.id
+        }
+      })
+      setDoctor(docs)
+    }
+    fetchData()
+  }, [])
+
   const onChange = (date, dateString) => {
-    // console.log(date, dateString);
+    console.log('FECHA', date, dateString);
     setIsClicked(true);
   };
   const loadFile = (event) => {
     // Handle file loading logic here
   };
+
+  const onSubmit = handleSubmit(async data => {
+    const patientName = watch("name")
+    const patientLastname = watch("lastName")
+    const patients = await fetchUsers()
+
+    const patient = patients.filter(user =>
+      user.nombre === patientName
+      & user.apellido === patientLastname
+      & user.tipo_usuario === 'alumno'
+    )
+    console.log({ ...data, "patient_id": patient[0].id })
+    addAppointment({ ...data, "patient_id": patient[0].id })
+  })
 
   return (
     <div>
@@ -45,14 +78,14 @@ const AddAppoinments = () => {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                     <Link to="#">Appointment </Link>
+                      <Link to="#">Agenda </Link>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right">
                         <FeatherIcon icon="chevron-right" />
                       </i>
                     </li>
-                    <li className="breadcrumb-item active">Add Appointment</li>
+                    <li className="breadcrumb-item active">Agregar Cita</li>
                   </ul>
                 </div>
               </div>
@@ -66,29 +99,49 @@ const AddAppoinments = () => {
                       <div className="row">
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Patient Details</h4>
+                            <h4>Detalles del Paciente</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              First Name <span className="login-danger">*</span>
+                              Nombre <span className="login-danger">*</span>
                             </label>
-                            <input className="form-control" type="text" />
+                            <input
+                              className="form-control"
+                              type="text"
+                              {...register('name', {
+                                required: {
+                                  value: true,
+                                  message: 'Nombre es requerido'
+                                },
+                                minLength: {
+                                  value: 2,
+                                  message: 'Nombre debe tener al menos 2 caracteres'
+                                }
+                              })}
+                            />
+                            {
+                              errors.name && <span><small>{errors.name.message}</small></span>
+                            }
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              Last Name <span className="login-danger">*</span>
+                              Apellidos <span className="login-danger">*</span>
                             </label>
-                            <input className="form-control" type="text" />
+                            <input
+                              className="form-control"
+                              type="text"
+                              {...register('lastName')}
+                            />
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group select-gender">
                             <label className="gen-label">
-                              Gender<span className="login-danger">*</span>
+                              Género <span className="login-danger">*</span>
                             </label>
                             <div className="form-check-inline">
                               <label className="form-check-label">
@@ -96,8 +149,9 @@ const AddAppoinments = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
+                                  {...register('male')}
                                 />
-                                Male
+                                Masculino
                               </label>
                             </div>
                             <div className="form-check-inline">
@@ -106,32 +160,52 @@ const AddAppoinments = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
+                                  {...register('female')}
                                 />
-                                Female
+                                Femenino
                               </label>
-                              </div>
-                          </div>
-                        </div>
-                                        <div className="col-12 col-md-6 col-xl-6">
-                          <div className="form-group local-forms">
-                            <label>
-                              Mobile <span className="login-danger">*</span>
-                            </label>
-                            <input className="form-control" type="text" />
+                            </div>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Email <span className="login-danger">*</span>
+                              Teléfono <span className="login-danger">*</span>
                             </label>
-                            <input className="form-control" type="email" />
+                            <input
+                              className="form-control"
+                              type="text"
+                              {...register('mobile')}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-xl-6">
+                          <div className="form-group local-forms">
+                            <label>
+                              Correo electrónico <span className="login-danger">*</span>
+                            </label>
+                            <input
+                              className="form-control"
+                              type="email"
+                              {...register('email', {
+                                required: {
+                                  value: true,
+                                  message: 'Correo es requerido'
+                                },
+                                // pattern: {
+                                //   value: /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\. [a-zA-Z]{2,4}$/,
+                                //   message: 'Correo no es válido'
+                                // }
+                              })}
+                            />
+                            {errors.email && <span><small>{errors.email.message}</small></span>}
+
                           </div>
                         </div>
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Address <span className="login-danger">*</span>
+                              Dirección <span className="login-danger">*</span>
                             </label>
                             <textarea
                               className="form-control"
@@ -143,28 +217,42 @@ const AddAppoinments = () => {
                         </div>
                         <div className="col-12">
                           <div className="form-heading">
-                            <h4>Appointment Details</h4>
+                            <h4>Detalles de la Cita</h4>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms cal-icon">
                             <label>
-                              Date of Appointment{" "}
+                              Día de la Cita{" "}
                               <span className="login-danger">*</span>
                             </label>
-                            <DatePicker
-                              className="form-control datetimepicker"
-                              onChange={onChange}
-                              suffixIcon={null}
-                              style={{
-                                control: (baseStyles, state) => ({
-                                  ...baseStyles,
-                                borderColor: isClicked ? '#2E37A4' : '2px solid rgba(46, 55, 164, 0.1)',
-                                '&:hover': {
-                                  borderColor: state.isFocused ? 'none' : 'none',
-                                },
-                              })
-                            }}
+                            <Controller
+                              control={control}
+                              name="appointment_date"
+                              {...register('appointment_date', {
+                                required: {
+                                  value: true,
+                                  message: 'Días es requerido',
+                                }
+                              })}
+                              ref={null}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <DatePicker
+                                  className="form-control datetimepicker"
+                                  onChange={onChange}
+                                  suffixIcon={null}
+                                  format={'YYYY-MM-DD'}
+                                  style={{
+                                    control: (baseStyles, state) => ({
+                                      ...baseStyles,
+                                      borderColor: isClicked ? '#2E37A4' : '2px solid rgba(46, 55, 164, 0.1)',
+                                      '&:hover': {
+                                        borderColor: state.isFocused ? 'none' : 'none',
+                                      },
+                                    })
+                                  }}
+                                />
+                              )}
                             />
                             {/* <input
                         className="form-control datetimepicker"
@@ -175,7 +263,7 @@ const AddAppoinments = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              From <span className="login-danger">*</span>
+                              Desde <span className="login-danger">*</span>
                             </label>
                             <div className="">
                               <TextField
@@ -186,6 +274,12 @@ const AddAppoinments = () => {
                                 onChange={(event) => {
                                   setStartTime(event.target.value);
                                 }}
+                                {...register('start_time', {
+                                  required: {
+                                    value: true,
+                                    message: 'Hora es requerida',
+                                  }
+                                })}
                               />
                             </div>
                           </div>
@@ -193,7 +287,7 @@ const AddAppoinments = () => {
                         <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
-                              To <span className="login-danger">*</span>
+                              Hasta <span className="login-danger">*</span>
                             </label>
                             <div className="">
                               <TextField
@@ -204,44 +298,63 @@ const AddAppoinments = () => {
                                 onChange={(event) => {
                                   setEndTime(event.target.value);
                                 }}
+                                {...register('end_time', {
+                                  required: {
+                                    value: true,
+                                    message: 'Hora es requerida',
+                                  }
+                                })}
                               />
                             </div>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
-                            <label>Consulting Doctor</label>
-                            <Select
-                              defaultValue={selectedOption}
-                              onChange={setSelectedOption}
-                              options={doctor}
-                              menuPortalTarget={document.body}
-                              styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                              id="search-commodity"
-                              components={{
-                                IndicatorSeparator: () => null
-                              }}
+                            <label>Doctor </label>
+                            <Controller
+                              control={control}
+                              name="doctor"
+                              {...register('doctor', {
+                                required: {
+                                  value: true,
+                                  message: 'Doctor es requerido',
+                                }
+                              })}
+                              ref={null}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <Select
+                                  defaultValue={selectedOption}
+                                  onChange={onChange}
+                                  options={doctor}
+                                  menuPortalTarget={document.body}
+                                  styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                  id="search-commodity"
+                                  components={{
+                                    IndicatorSeparator: () => null
+                                  }}
 
-                              styles={{
-                                control: (baseStyles, state) => ({
-                                  ...baseStyles,
-                                  borderColor: state.isFocused ?'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                   boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
-                                  '&:hover': {
-                                    borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
-                                  },
-                                  borderRadius: '10px',
-                                  fontSize: "14px",
-                                    minHeight: "45px",
-                                }),
-                                dropdownIndicator: (base, state) => ({
-                                  ...base,
-                                  transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
-                                  transition: '250ms',
-                                  width: '35px',
-                                  height: '35px',
-                                }),
-                              }}
+                                  styles={{
+                                    control: (baseStyles, state) => ({
+                                      ...baseStyles,
+                                      borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                      boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                      '&:hover': {
+                                        borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
+                                      },
+                                      borderRadius: '10px',
+                                      fontSize: "14px",
+                                      minHeight: "45px",
+                                    }),
+                                    dropdownIndicator: (base, state) => ({
+                                      ...base,
+                                      transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
+                                      transition: '250ms',
+                                      width: '35px',
+                                      height: '35px',
+                                    }),
+                                  }}
+                                />
+                              )}
                             />
                             {/* <select className="form-control select">
                         <option>Select Doctor</option>
@@ -253,14 +366,14 @@ const AddAppoinments = () => {
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
-                            <label>Treatment </label>
+                            <label>Tratamiento </label>
                             <input className="form-control" type="text" />
                           </div>
                         </div>
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Notes <span className="login-danger">*</span>
+                              Notas <span className="login-danger">*</span>
                             </label>
                             <textarea
                               className="form-control"
@@ -270,7 +383,7 @@ const AddAppoinments = () => {
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-6">
+                        {/* <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-top-form">
                             <label className="local-top">
                               Avatar <span className="login-danger">*</span>
@@ -289,20 +402,21 @@ const AddAppoinments = () => {
                               </label>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="col-12">
                           <div className="doctor-submit text-end">
                             <button
-                              type="submit"
+                              // type="submit"
                               className="btn btn-primary submit-form me-2"
+                              onClick={onSubmit}
                             >
-                              Submit
+                              Enviar
                             </button>
                             <button
-                              type="submit"
+                              // type="submit"
                               className="btn btn-primary cancel-form"
                             >
-                              Cancel
+                              Cancelar
                             </button>
                           </div>
                         </div>
@@ -321,7 +435,7 @@ const AddAppoinments = () => {
               <div className="drop-scroll msg-list-scroll" id="msg_list">
                 <ul className="list-box">
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">R</span>
@@ -338,7 +452,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item new-message">
                         <div className="list-left">
                           <span className="avatar">J</span>
@@ -355,7 +469,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">T</span>
@@ -375,7 +489,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">M</span>
@@ -392,7 +506,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">C</span>
@@ -412,7 +526,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">D</span>
@@ -432,7 +546,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">B</span>
@@ -452,7 +566,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">R</span>
@@ -472,7 +586,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">C</span>
@@ -489,7 +603,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">M</span>
@@ -506,7 +620,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">J</span>
@@ -523,7 +637,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">L</span>
@@ -540,7 +654,7 @@ const AddAppoinments = () => {
                     </Link>
                   </li>
                   <li>
-                   <Link to="#">
+                    <Link to="#">
                       <div className="list-item">
                         <div className="list-left">
                           <span className="avatar">T</span>
@@ -561,7 +675,7 @@ const AddAppoinments = () => {
                 </ul>
               </div>
               <div className="topnav-dropdown-footer">
-               <Link to="#">See all messages</Link>
+                <Link to="#">See all messages</Link>
               </div>
             </div>
           </div>

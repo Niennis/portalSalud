@@ -1,3 +1,10 @@
+const formatDate = (date) => {
+  const month = date.getMonth()
+  const day = date.getDate()
+  const year = date.getFullYear()
+  return `${year}-${month}-${day}`
+}
+
 export async function fetchAppointments(url) {
   const data = await fetch( url , {
     headers: {
@@ -15,3 +22,31 @@ export async function fetchAppointments(url) {
   
   return response
 }
+
+export async function addAppointment(appointment) {
+  const APPOINMENT_API = process.env.REACT_APP_APPOINTMENTS_API
+
+  const body = {
+    profesional_id: appointment.doctor.id,
+    alumno_id: appointment.patient_id,
+    fecha: formatDate(appointment.appointment_date.$d),
+    hora: appointment.start_time.concat(':00'),
+    estado: "pendiente"
+  }
+  console.log('BODY', body);
+
+  const data = await fetch(APPOINMENT_API + '/api/appointments', {
+    method: "POST",
+    cors: "no-cors",
+    headers: {
+      'content-type': 'application/json',
+      'access-control-allow-origin': '*',
+      'ngrok-skip-browser-warning': 'any'
+    },
+    body: JSON.stringify(body)
+  })
+
+  return data.json()
+}
+
+

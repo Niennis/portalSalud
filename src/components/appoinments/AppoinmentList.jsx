@@ -11,8 +11,7 @@ import FeatherIcon from 'feather-icons-react/build/FeatherIcon';
 
 import { fetchAppointments } from '../../utils/appointments'
 
-const APPOINTMENTS_URL = 'https://appointments-y4fi.onrender.com' + '/api/appointments'
-
+const APPOINTMENTS_URL = process.env.REACT_APP_APPOINTMENTS_API + '/api/appointments'
 
 const AppoinmentList = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -21,7 +20,7 @@ const AppoinmentList = () => {
     useEffect(() => {
       const fetchData = async () => {
         const data = await fetchAppointments(APPOINTMENTS_URL)
-        console.log('DATA', data);
+        console.log('APPOINTMENTS', data);
       
         setAppointments(data.response)
       }
