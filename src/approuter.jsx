@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 // eslint-disable-next-line no-unused-vars
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/pages/login";
 // import config from "config";
 import Addblog from "./components/pages/Blog/Addblog";
@@ -125,19 +125,21 @@ import Payslip from "./components/Payroll/Payslip";
 import Setting from "./components/settings/Setting";
 import GalleryImage from "./components/pages/Gallery/Gallery";
 
+// import { UserProvider } from "./utils/UserContext";
 // import { fetchUser } from "./utils/editUser";
 
 //Accounts
 const Approuter = () => {
   // const config = "/react/template"
   // eslint-disable-next-line no-unused-vars
-  const params = useParams()
+  // const params = useParams()
   // eslint-disable-next-line no-unused-vars
-  const [user, setUser] = useState('')
+  // const [user, setUser] = useState('')
 
   return (
     <>
       <BrowserRouter basename="/">
+      {/* <UserProvider> */}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
@@ -193,7 +195,7 @@ const Approuter = () => {
           {/* Appoinments */}
           <Route path="/appoinmentlist" element={<AppoinmentList />} />
           <Route path="/addappoinments" element={<AddAppoinments />} />
-          <Route path="/editappoinments" element={<EditAppoinments />} />
+          <Route path="/editappoinments/:id" element={<EditAppoinments />} />
           {/* DoctorSchedule */}
           <Route path="/schedulelist" element={<ScheduleList />} />
           <Route path="/addschedule" element={<AddSchedule />} />
@@ -285,6 +287,7 @@ const Approuter = () => {
           <Route path="/doctor-dashboard" element={<Doctor_Dashboard />} />
           <Route path="/patient-dashboard" element={<Patient_Dashboard />} />
         </Routes>
+        {/* </UserProvider> */}
       </BrowserRouter>
       <div className="sidebar-overlay"></div>
     </>
