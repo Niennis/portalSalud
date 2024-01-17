@@ -46,7 +46,8 @@ export async function fetchUser(id) {
       'ngrok-skip-browser-warning': 'any'
     }
   })
-  return data.json()
+  const response = data.json()
+  return response
 }
 
 export async function updateUser(user, id) {
