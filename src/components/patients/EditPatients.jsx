@@ -26,7 +26,9 @@ const EditPatients = (user) => {
         confirmPassword: user.contrasena,
         date: user.fecha_nacimiento.slice(0, 10),
         male: user.genero === 'masculino' ? 'on' : null,
-        female: user.genero === 'femenino' ? 'on' : null
+        female: user.genero === 'femenino' ? 'on' : null,
+        active: user.status === 'active' ? 'on' : null,
+        inactive: user.status === 'inactive' ? 'on' : null
       }
       return obj
     })
@@ -73,7 +75,7 @@ const EditPatients = (user) => {
   const loadFile = (event) => { };
 
   const onSubmit = handleSubmit(data => {
-    console.log('enviadoo data', data)
+    // console.log('enviadoo data', data)
     return updateUser(data, id)
   })
 
@@ -119,7 +121,7 @@ const EditPatients = (user) => {
                             <h4>Detalles del Paciente</h4>
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
                               Nombre <span className="login-danger">*</span>
@@ -144,7 +146,7 @@ const EditPatients = (user) => {
                             }
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
                               Apellidos <span className="login-danger">*</span>
@@ -157,7 +159,7 @@ const EditPatients = (user) => {
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        {/* <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
                               Nombre de usuario <span className="login-danger">*</span>
@@ -169,7 +171,7 @@ const EditPatients = (user) => {
                               {...register('userName')}
                             />
                           </div>
-                        </div>
+                        </div> */}
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
@@ -213,7 +215,7 @@ const EditPatients = (user) => {
                             </label>
                             <input
                               className="form-control"
-                              type="text"
+                              type="password"
                               // defaultValue={values.password}
                               {...register('password', {
                                 required: {
@@ -237,7 +239,7 @@ const EditPatients = (user) => {
                             </label>
                             <input
                               className="form-control"
-                              type="text"
+                              type="password"
                               // defaultValue={values.password}
                               {...register('confirmPassword', {
                                 required: {
@@ -302,36 +304,47 @@ const EditPatients = (user) => {
                                 Femenino
                               </label>
                             </div>
+                            <div className="form-check-inline">
+                              <label className="form-check-label">
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  className="form-check-input"
+                                  {...register('other')}
+                                />
+                                Otro
+                              </label>
+                            </div>
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Educación <span className="login-danger">*</span>
+                              Carrera <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
                               defaultValue="M.B.B.S, M.S."
-                              {...register('education')}
+                              {...register('carrera')}
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Designación{" "}
+                              Campus{" "}
                               <span className="login-danger">*</span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
-                              defaultValue="Physician"
-                              {...register('designation')}
+                              defaultValue=" "
+                              {...register('campus')}
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        {/* <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
                               Departmento <span className="login-danger">*</span>
@@ -367,11 +380,11 @@ const EditPatients = (user) => {
                             />
 
                           </div>
-                        </div>
+                        </div> */}
                         <div className="col-12 col-sm-12">
                           <div className="form-group local-forms">
                             <label>
-                              Dirección <span className="login-danger">*</span>
+                              Dirección <span className="login-danger"></span>
                             </label>
                             <textarea
                               className="form-control"
@@ -386,7 +399,7 @@ const EditPatients = (user) => {
                         <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
-                              Ciudad <span className="login-danger">*</span>
+                              Ciudad <span className="login-danger"></span>
                             </label>
                             <Select
                               defaultValue={selectedOption}
@@ -430,7 +443,7 @@ const EditPatients = (user) => {
                         <div className="col-12 col-md-6 col-xl-3">
                           <div className="form-group local-forms">
                             <label>
-                              País <span className="login-danger">*</span>
+                              País <span className="login-danger"></span>
                             </label>
                             <Select
                               defaultValue={selectedOption}
@@ -475,7 +488,7 @@ const EditPatients = (user) => {
                           <div className="form-group local-forms">
                             <label>
                               Región {" "}
-                              <span className="login-danger">*</span>
+                              <span className="login-danger"></span>
                             </label>
                             <Select
                               defaultValue={selectedOption}
@@ -512,12 +525,12 @@ const EditPatients = (user) => {
                           <div className="form-group local-forms">
                             <label>
                               Postal Code{" "}
-                              <span className="login-danger">*</span>
+                              <span className="login-danger"></span>
                             </label>
                             <input
                               className="form-control"
                               type="text"
-                              defaultValue={91403}
+                              // defaultValue={91403}
                             />
                           </div>
                         </div>
@@ -590,21 +603,23 @@ const EditPatients = (user) => {
                               <label className="form-check-label">
                                 <input
                                   type="radio"
-                                  name="gender1"
+                                  name="status"
                                   className="form-check-input"
-                                  defaultChecked="true"
+                                  // defaultChecked="true"
+                                  {...register('active')}
                                 />
-                                Active
+                                Activo
                               </label>
                             </div>
                             <div className="form-check-inline">
                               <label className="form-check-label">
                                 <input
                                   type="radio"
-                                  name="gender1"
+                                  name="status"
                                   className="form-check-input"
+                                  {...register('inactive')}
                                 />
-                                In Active
+                                Inactivo
                               </label>
                             </div>
                           </div>

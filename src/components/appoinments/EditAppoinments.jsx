@@ -10,11 +10,12 @@ import { Link, useParams } from "react-router-dom";
 import Select from "react-select";
 import { TextField } from "@mui/material";
 import { useForm, Controller } from 'react-hook-form'
-import { fetchAppointment, updateAppointment } from "../../utils/appointments";
+import { fetchDataDate, updateAppointment } from "../../utils/appointments";
 import { fetchDoctors, fetchUsers } from '../../utils/fetchUsers'
 
 const EditAppoinments = () => {
   const { id } = useParams();
+  const [appointment, setAppointment] = useState()
 
   const [startTime, setStartTime] = useState();
   const [endTime, setEndTime] = useState();
@@ -50,30 +51,34 @@ const EditAppoinments = () => {
     // Handle file loading logic here
   };
 
-
   const { register, handleSubmit, watch, control,
     formState: { errors }
   } = useForm({
-    defaultValues: async () => fetchAppointment(id).then(appointment => {
-
-      const filterDoc = doctor.filter(doc => doc.label === appointment.nombre_profesional + ' ' + appointment.apellido_profesional)
-
-      console.log(filterDoc);
-      const obj = {
-        especialidad: appointment.especialidad,
-        appointment_date: appointment['fecha_cita'].slice(0, 10),
-        start_time: appointment['hora_cita'],
-        id: appointment.id,
-        email: appointment.mail_alumno,
-        name: appointment['nombre_alumno'],
-        lastName: appointment['apellido_alumno'],
-        selected_doctor: filterDoc[0]
-      }
-      return obj
-    })
+    defaultValues: async () => fetchDataDate(id)
+      .then(appointment => {
+        const filterDoc = doctor.filter(doc => doc.label === appointment.nombre_profesional + ' ' + appointment.apellido_profesional)
+        console.log(appointment);
+        const obj = {
+          especialidad: appointment.especialidad,
+          appointment_date: appointment['fecha_cita'],
+          start_time: appointment['hora_cita'],
+          id: appointment.id,
+          email: appointment.mail_alumno,
+          name: appointment['nombre_alumno'],
+          lastName: appointment['apellido_alumno'],
+          selected_doctor: filterDoc[0],
+          female: appointment.genero === 'femenino' ? 'on' : null,
+          male: appointment.genero === 'masculino' ? 'on' : null,
+          other: appointment.genero === 'otro' ? 'on' : null,
+          mobile: appointment.telefono_alumno
+        }
+        return obj
+      })
   })
 
-  const onSubmit = handleSubmit(async data => {
+  const onSubmit = handleSubmit(async (data, e) => {
+    e.preventDefault()
+    console.log('HOLA', data)
     const patientName = watch("name")
     const patientLastname = watch("lastName")
     const patients = await fetchUsers()
@@ -83,8 +88,8 @@ const EditAppoinments = () => {
       & user.apellido === patientLastname
       & user.tipo_usuario === 'alumno'
     )
-    // addAppointment({ ...data, "patient_id": patient[0].id })
-    return updateAppointment({ ...data, "patient_id": patient[0].id }, id)
+    console.log('onsubmit', { ...data, "patient_id": patient[0].id })
+    updateAppointment({ ...data, "patient_id": patient[0].id }, id)
   })
 
   return (
@@ -177,7 +182,7 @@ const EditAppoinments = () => {
                                   name="gender"
                                   className="form-check-input"
                                   defaultChecked=""
-                                // {...register('male')}
+                                  {...register('male')}
                                 />
                                 Masculino
                               </label>
@@ -188,9 +193,20 @@ const EditAppoinments = () => {
                                   type="radio"
                                   name="gender"
                                   className="form-check-input"
-                                // {...register('female')}
+                                  {...register('female')}
                                 />
                                 Femenino
+                              </label>
+                            </div>
+                            <div className="form-check-inline">
+                              <label className="form-check-label">
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  className="form-check-input"
+                                  {...register('other')}
+                                />
+                                Otro
                               </label>
                             </div>
                           </div>
@@ -203,8 +219,8 @@ const EditAppoinments = () => {
                             <input
                               className="form-control"
                               type="text"
-                              defaultValue="+1 23 456890"
-                            // {...register('mobile')}
+                              // defaultValue="+1 23 456890"
+                              {...register('mobile')}
                             />
                           </div>
                         </div>
@@ -267,14 +283,20 @@ const EditAppoinments = () => {
                                 }
                               })}
                               ref={null}
-                              render={({ field: { onChange, onBlur, value } }) => (
-                                <DatePicker
-                                  className="form-control datetimepicker"
-                                  onChange={onChange}
-                                  suffixIcon={null}
-                                />
-                              )}
+                              render={({ field: { onChange, onBlur, value } }) => {
+                                return (
+                                  <DatePicker
+                                    className="form-control datetimepicker"
+                                    onChange={onChange}
+                                    suffixIcon={null}
+                                  />
+                                )
+                              }}
                             />
+
+                            {
+                              errors.name && <span><small>{errors.name.message}</small></span>
+                            }
                             {/* <input
                         className="form-control datetimepicker"
                         type="text"
@@ -311,7 +333,7 @@ const EditAppoinments = () => {
                                 className="form-control"
                                 id="outlined-controlled"
                                 type="time"
-                                value={endTime}
+                                value={startTime}
                                 onChange={(event) => {
                                   setEndTime(event.target.value);
                                 }}
@@ -368,6 +390,9 @@ const EditAppoinments = () => {
                               )}
                             />
 
+                            {
+                              errors.name && <span><small>{errors.name.message}</small></span>
+                            }
                             {/* <select className="form-control select">
                         <option>Select Doctor</option>
                         <option>Dr.Bernardo James</option>

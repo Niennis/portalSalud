@@ -87,7 +87,7 @@ const AddPatients = () => {
                             <h4>Detalles pacientes</h4>
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
                               Nombre <span className="login-danger">*</span>
@@ -112,7 +112,7 @@ const AddPatients = () => {
                             }
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
                               Apellidos <span className="login-danger">*</span>
@@ -125,7 +125,7 @@ const AddPatients = () => {
                             />
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        {/* <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
                               Nombre de usuario <span className="login-danger">*</span>
@@ -137,7 +137,7 @@ const AddPatients = () => {
                               {...register('userName')}
                             />
                           </div>
-                        </div>
+                        </div> */}
                         <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
@@ -272,6 +272,17 @@ const AddPatients = () => {
                                   {...register('female')}
                                 />
                                 Femenino
+                              </label>
+                            </div>
+                            <div className="form-check-inline">
+                              <label className="form-check-label">
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  className="form-check-input"
+                                  {...register('other')}
+                                />
+                                Otro
                               </label>
                             </div>
                           </div>

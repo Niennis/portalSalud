@@ -165,6 +165,17 @@ const AddAppoinments = () => {
                                 Femenino
                               </label>
                             </div>
+                            <div className="form-check-inline">
+                              <label className="form-check-label">
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  className="form-check-input"
+                                  {...register('other')}
+                                />
+                                Otro
+                              </label>
+                            </div>
                           </div>
                         </div>
                         <div className="col-12 col-md-6 col-xl-6">

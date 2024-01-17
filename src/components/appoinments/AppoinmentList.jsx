@@ -11,23 +11,17 @@ import { onShowSizeChange, itemRender } from '../Pagination'
 import { Link } from 'react-router-dom';
 import FeatherIcon from 'feather-icons-react/build/FeatherIcon';
 
-import { fetchAppointments, updateAppointment, deleteAppointment } from '../../utils/appointments'
-
-const APPOINTMENTS_URL = process.env.REACT_APP_APPOINTMENTS_API + '/api/appointments'
+import { changeStatusAppointment, fetchData, search } from '../../utils/appointments'
 
 const AppoinmentList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [appointments, setAppointments] = useState([])
   const [idAppointment, setIdAppointment] = useState('')
+  const [results, setResults] = useState([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchAppointments(APPOINTMENTS_URL)
-      console.log('APPOINTMENTS', data);
-
-      setAppointments(data.response)
-    }
-    fetchData()
+    fetchData(setAppointments)
+    fetchData(setResults)
   }, [])
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -40,9 +34,14 @@ const AppoinmentList = () => {
     onChange: onSelectChange,
   };
 
-  const handleDelete = id => {
+  const handleCancel = id => {
     console.log('ID', id, idAppointment);
-    deleteAppointment(id)
+    changeStatusAppointment(id, 'cancelada')
+  }
+
+  const handleSearch = (e) => {
+    const bleh = search(appointments, e)
+    setResults(bleh)
   }
 
   const columns = [
@@ -52,13 +51,13 @@ const AppoinmentList = () => {
       render: (text, record) => (
         <>
           <h2 className="profile-image">
-            <Link to="#" className="avatar avatar-sm me-2">
+            {/* <Link to="#" className="avatar avatar-sm me-2">
               <img
                 className="avatar-img rounded-circle"
                 src={record.Img}
                 alt="User Image"
               />
-            </Link>
+            </Link> */}
             <Link to="#">{record.nombre_alumno}</Link>
           </h2>
 
@@ -81,14 +80,12 @@ const AppoinmentList = () => {
       sorter: (a, b) => a['telefono_alumno'].length - b['telefono_alumno'].length
     },
     {
-      title: "Email",
+      title: "Correo electrónico",
       dataIndex: "mail_alumno",
       sorter: (a, b) => a['mail_alumno'].length - b['mail_alumno'].length,
       render: (text, record) => (
         <>
-
           <Link to="#">{record.mail_alumno}</Link>
-
         </>
       )
     }, {
@@ -97,8 +94,12 @@ const AppoinmentList = () => {
       sorter: (a, b) => a['fecha_cita'].length - b['fecha_cita'].length
     }, {
       title: "Hora",
-      dataIndex: "fecha_hora",
-      sorter: (a, b) => a.fecha_hora.length - b.fecha_hora.length
+      dataIndex: "hora_cita",
+      sorter: (a, b) => a.hora_cita.length - b.hora_cita.length
+    }, {
+      title: "Estado",
+      dataIndex: "estado",
+      sorter: (a, b) => a.estado.length - b.estado.length
     },
     {
       title: "",
@@ -153,14 +154,14 @@ const AppoinmentList = () => {
                 <div className="col-sm-12">
                   <ul className="breadcrumb">
                     <li className="breadcrumb-item">
-                      <Link to="#">Appoinment</Link>
+                      <Link to="#">Agenda </Link>
                     </li>
                     <li className="breadcrumb-item">
                       <i className="feather-chevron-right">
                         <FeatherIcon icon="chevron-right" />
                       </i>
                     </li>
-                    <li className="breadcrumb-item active">Appoinment  List</li>
+                    <li className="breadcrumb-item active">Lista de citas </li>
                   </ul>
                 </div>
               </div>
@@ -175,7 +176,7 @@ const AppoinmentList = () => {
                       <div className="row align-items-center">
                         <div className="col">
                           <div className="doctor-table-blk">
-                            <h3>Appoinment List</h3>
+                            <h3>Agenda </h3>
                             <div className="doctor-search-blk">
                               <div className="top-nav-search table-search-blk">
                                 <form>
@@ -183,6 +184,7 @@ const AppoinmentList = () => {
                                     type="text"
                                     className="form-control"
                                     placeholder="Search here"
+                                    onChange={(e) => { handleSearch(e.target.value) }}
                                   />
                                   <Link className="btn">
                                     <img
@@ -227,15 +229,15 @@ const AppoinmentList = () => {
                     <div className="table-responsive doctor-list">
                       <Table
                         pagination={{
-                          total: appointments.length,
+                          total: results.length,
                           showTotal: (total, range) =>
-                            `Showing ${range[0]} to ${range[1]} of ${total} entries`,
+                            `Mostrando de ${range[0]} a ${range[1]} de ${total} entradas`,
                           //showSizeChanger: true,
                           onShowSizeChange: onShowSizeChange,
                           itemRender: itemRender,
                         }}
                         columns={columns}
-                        dataSource={appointments}
+                        dataSource={results}
 
                         rowSelection={rowSelection}
                         rowKey={(record) => record.id}
@@ -496,15 +498,15 @@ const AppoinmentList = () => {
                   <button
                     type="submit"
                     className="btn btn-danger"
-                    onClick={() => { handleDelete(idAppointment) }}
+                    onClick={() => { handleCancel(idAppointment) }}
                   >
-                    Eliminar
+                    Cancelar
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <div id="delete_patient" className="modal fade delete-modal" role="dialog">
+          {/* <div id="delete_patient" className="modal fade delete-modal" role="dialog">
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-body text-center">
@@ -522,18 +524,13 @@ const AppoinmentList = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
       </>
-
-
       <>
-
       </>
-
     </>
-
   )
 }
 

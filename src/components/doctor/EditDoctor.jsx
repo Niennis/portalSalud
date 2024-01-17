@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import { Link, useParams } from "react-router-dom";
@@ -9,11 +9,12 @@ import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 // import { DatePicker } from "antd";
 import Select from "react-select";
 import { fetchDoctor, updateDoctor } from "../../utils/editUser";
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
 
 const EditDoctor = () => {
   const { id } = useParams();
+  const [initial, setInitial] = useState({})
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [options, setOptions] = useState([
@@ -33,9 +34,9 @@ const EditDoctor = () => {
     { value: 3, label: "California" },
   ]);
   const [department, setDepartment] = useState([
-    { value: 1, label: "Orthopedics" },
-    { value: 2, label: "Radiology" },
-    { value: 3, label: "Dentist" },
+    { value: "psicopedagogia", label: "Psicopedagogia", name: 'specialization' },
+    { value: "psicologia", label: "Psicologia", name: 'specialization' },
+    { value: "psiquiatria", label: "siquiatria", name: 'specialization' },
   ]);
 
   const [show, setShow] = useState(false);
@@ -50,7 +51,7 @@ const EditDoctor = () => {
   const { register, handleSubmit, watch, control,
     formState: { errors }
   } = useForm({
-    defaultValues: async () => fetchDoctor(id).then(user => {
+    defaultValues: () => fetchDoctor(id).then(user => {
       const obj = {
         name: user.nombre,
         lastName: user.apellido,
@@ -61,6 +62,7 @@ const EditDoctor = () => {
         date: user.fecha_nacimiento.slice(0, 10),
         male: user.genero === 'masculino' ? 'on' : null,
         female: user.genero === 'femenino' ? 'on' : null,
+        other: user.genero === 'otro' ? 'on' : null,
         specialization: user.especialidad
       }
       return obj
@@ -68,7 +70,7 @@ const EditDoctor = () => {
   })
 
   const onSubmit = handleSubmit(data => {
-    return updateDoctor({...data, 'tipo_usuario': 'profesional'}, id)
+    return updateDoctor({ ...data, 'tipo_usuario': 'profesional' }, id)
   })
 
   return (
@@ -189,10 +191,10 @@ const EditDoctor = () => {
                                   value: true,
                                   message: 'Corre es requerido'
                                 },
-                                // pattern: {
-                                //   value: /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\. [a-zA-Z]{2,4}$/,
-                                //   message: 'Correo no es válido'
-                                // }
+                                pattern: {
+                                  value: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/,
+                                  message: 'Correo no es válido'
+                                }
                               })}
                             />
                             {errors.email && <span><small>{errors.email.message}</small></span>}
@@ -306,10 +308,21 @@ const EditDoctor = () => {
                                 />
                                 Femenino
                               </label>
+                            </div><
+                              div className="form-check-inline">
+                              <label className="form-check-label">
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  className="form-check-input"
+                                  {...register('other')}
+                                />
+                                Otro
+                              </label>
                             </div>
                           </div>
                         </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        {/* <div className="col-12 col-md-6 col-xl-4">
                           <div className="form-group local-forms">
                             <label>
                               Especialidad <span className="login-danger">*</span>
@@ -320,53 +333,49 @@ const EditDoctor = () => {
                               {...register('specialization')}
                             />
                           </div>
-                        </div>
-                        <div className="col-12 col-md-6 col-xl-4">
+                        </div> */}
+
+                        <div className="col-12 col-md-6 col-xl-6">
                           <div className="form-group local-forms">
                             <label>
-                              Designación {" "}
-                              <span className="login-danger">*</span>
+                              Especialidad <span className="login-danger">*</span>
                             </label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              defaultValue="Physician"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-12 col-md-6 col-xl-4">
-                          <div className="form-group local-forms">
-                            <label>
-                              Departmento <span className="login-danger">*</span>
-                            </label>
-                            <Select
-                              defaultValue={selectedOption}
-                              onChange={setSelectedOption}
-                              options={department}
-                              id="search-commodity"
-                              components={{
-                                IndicatorSeparator: () => null
-                              }}
-                              styles={{
-                                control: (baseStyles, state) => ({
-                                  ...baseStyles,
-                                  borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
-                                  boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
-                                  '&:hover': {
-                                    borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
-                                  },
-                                  borderRadius: '10px',
-                                  fontSize: "14px",
-                                  minHeight: "45px",
-                                }),
-                                dropdownIndicator: (base, state) => ({
-                                  ...base,
-                                  transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
-                                  transition: '250ms',
-                                  width: '35px',
-                                  height: '35px',
-                                }),
-                              }}
+                            <Controller
+                              control={control}
+                              name="specialization"
+                              render={({ field: { onChange, onBlur, value, ref } }) => (
+                                <Select
+                                  onBlur={onBlur}
+                                  defaultValue={value}
+                                  onChange={onChange}
+                                  selected={value}
+                                  options={department}
+                                  id="search-commodity"
+                                  components={{
+                                    IndicatorSeparator: () => null
+                                  }}
+                                  styles={{
+                                    control: (baseStyles, state) => ({
+                                      ...baseStyles,
+                                      borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1);',
+                                      boxShadow: state.isFocused ? '0 0 0 1px #2e37a4' : 'none',
+                                      '&:hover': {
+                                        borderColor: state.isFocused ? 'none' : '2px solid rgba(46, 55, 164, 0.1)',
+                                      },
+                                      borderRadius: '10px',
+                                      fontSize: "14px",
+                                      minHeight: "45px",
+                                    }),
+                                    dropdownIndicator: (base, state) => ({
+                                      ...base,
+                                      transform: state.selectProps.menuIsOpen ? 'rotate(-180deg)' : 'rotate(0)',
+                                      transition: '250ms',
+                                      width: '35px',
+                                      height: '35px',
+                                    }),
+                                  }}
+                                />
+                              )}
                             />
 
                             {/* <select className="form-control select">
@@ -375,6 +384,19 @@ const EditDoctor = () => {
                               <option>Radiology</option>
                               <option>Dentist</option>
                             </select> */}
+                          </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-xl-6">
+                          <div className="form-group local-forms">
+                            <label>
+                              Campus {" "}
+                              <span className="login-danger">*</span>
+                            </label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              defaultValue="Physician"
+                            />
                           </div>
                         </div>
                         <div className="col-12 col-sm-12">

@@ -44,13 +44,13 @@ const PatientsList = () => {
       render: (text, record) => (
         <>
           <h2 className="profile-image">
-            <Link to="#" className="avatar avatar-sm me-2">
+            {/* <Link to="#" className="avatar avatar-sm me-2">
               <img
                 className="avatar-img rounded-circle"
                 src={record.img ?? blogimg2 }
                 alt="profile image"
               />
-            </Link>
+            </Link> */}
             <Link to="#">{record.nombre} {record.apellido}</Link>
           </h2>
 
@@ -90,11 +90,11 @@ const PatientsList = () => {
       dataIndex: "email",
       sorter: (a, b) => a.email.length - b.email.length
     },
-    // {
-    //   title: "JoiningDate",
-    //   dataIndex: "JoiningDate",
-    //   sorter: (a, b) => a.JoiningDate.length - b.JoiningDate.length
-    // },
+    {
+      title: "Estado",
+      dataIndex: "status",
+      sorter: (a, b) => a.JoiningDate.length - b.JoiningDate.length
+    },
     {
       title: "",
       dataIndex: "FIELD8",
