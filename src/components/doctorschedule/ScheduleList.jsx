@@ -6,36 +6,22 @@ import { Link } from "react-router-dom";
 import { pagination, Table } from "antd";
 import { onShowSizeChange, itemRender } from "../Pagination";
 import {
-  blogimg10,
-  blogimg12,
-  blogimg2,
-  blogimg4,
-  blogimg6,
-  blogimg8,
-  imagesend,
-  pdficon,
-  pdficon2,
-  pdficon3,
-  pdficon4,
-  plusicon,
-  refreshicon,
-  searchnormal,
-
-} from "../../components/imagepath";
+  blogimg10, blogimg12, blogimg2, blogimg4, blogimg6, blogimg8, imagesend, pdficon,
+  pdficon2, pdficon3, pdficon4, plusicon, refreshicon, searchnormal } from "../../components/imagepath";
 import FeatherIcon from "feather-icons-react/build/FeatherIcon";
 // import { Dropdown, Badge } from 'react-bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { fetchSchedules } from '../../utils/fetchSchedules'
+import { fetchDoctors } from "../../utils/fetchUsers";
 
 const ScheduleList = () => {
   const [dropdownValue, setDropdownValue] = useState('');
   const [schedules, setSchedules] = useState([])
 
   useEffect(() => {
-    
     const fetchData = async () => {
-      const data = await fetchSchedules()
+      const data = await fetchDoctors()
       console.log('DATA', data);
     
       setSchedules(data)
@@ -146,50 +132,50 @@ const ScheduleList = () => {
 
   const columns = [
     {
-      title: "Name",
-      dataIndex: "DoctorName",
+      title: "Nombre",
+      dataIndex: "nombre",
       render: (text, record) => (
         <>
           <h2 className="profile-image">
-            <Link to="#" className="avatar avatar-sm me-2">
+            {/* <Link to="#" className="avatar avatar-sm me-2">
               <img
                 className="avatar-img rounded-circle"
                 src={record.Img}
                 alt="rounded circle"
               />
-            </Link>
-            <Link to="#">{record.DoctorName}</Link>
+            </Link> */}
+            <Link to="#">{record.nombre} {record.apellido} </Link>
           </h2>
         </>
       ),
     },
     {
-      title: "Department",
-      dataIndex: "Department",
-      sorter: (a, b) => a.Department.length - b.Department.length,
+      title: "Especialidad",
+      dataIndex: "especialidad",
+      sorter: (a, b) => a.especialidad.length - b.especialidad.length,
     },
-    {
-      title: "AvailableDays",
-      dataIndex: "AvailableDays",
-      sorter: (a, b) => a.AvailableDays.length - b.AvailableDays.length,
-    },
-    {
-      title: "AvailableTime",
-      dataIndex: "AvailableTime",
-      sorter: (a, b) => a.AvailableTime.length - b.AvailableTime.length,
-    },
+    // {
+    //   title: "AvailableDays",
+    //   dataIndex: "AvailableDays",
+    //   sorter: (a, b) => a.AvailableDays.length - b.AvailableDays.length,
+    // },
+    // {
+    //   title: "AvailableTime",
+    //   dataIndex: "AvailableTime",
+    //   sorter: (a, b) => a.AvailableTime.length - b.AvailableTime.length,
+    // },
     {
       title: 'Status',
-      dataIndex: 'Status',
+      dataIndex: 'estado',
       // key: 'status',
       render: (text, record) => (
         <div>
-          {text === "Active" && (
+          {record.estado === "activo" && (
             <span className="custom-badge status-green">
               {text}
             </span>
           )}
-          {text === "In Active" && (
+          {record.estado === "inactivo" && (
             <span className="custom-badge status-pink">
               {text}
             </span>
@@ -363,7 +349,7 @@ const ScheduleList = () => {
                     <div className="table-responsive">
                       <Table
                         pagination={{
-                          total: datasource.length,
+                          total: schedules.length,
                           showTotal: (total, range) =>
                             `Showing ${range[0]} to ${range[1]} of ${total} entries`,
                           // showSizeChanger: true,
@@ -371,7 +357,7 @@ const ScheduleList = () => {
                           itemRender: itemRender,
                         }}
                         columns={columns}
-                        dataSource={datasource}
+                        dataSource={schedules}
                         rowSelection={rowSelection}
                         rowKey={(record) => record.id}
                       />
