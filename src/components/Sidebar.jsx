@@ -161,9 +161,9 @@ const Sidebar = (props) => {
                     <li>
                       <Link className={props?.activeClassName === 'add-appoinment' ? 'active' : ''} to="/addappoinments">Agregar cita</Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link className={props?.activeClassName === 'edit-appoinment' ? 'active' : ''} to="/editappoinments">Editar cita</Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </li>
                 <li className="submenu">
@@ -180,9 +180,9 @@ const Sidebar = (props) => {
                     <li>
                       <Link className={props?.activeClassName === 'add-shedule' ? 'active' : ''} to="/addschedule">Agregar horario</Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link className={props?.activeClassName === 'edit-shedule' ? 'active' : ''} to="/editschedule">Editar horario</Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </li>
                 {/* <li className="submenu">
